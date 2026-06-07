@@ -1,0 +1,315 @@
+---
+const photos = [
+  {
+    src: "/images/not-quite-leaving/01.jpg",
+    alt: "Photograph 1 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/02.jpg",
+    alt: "Photograph 2 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/03.jpg",
+    alt: "Photograph 3 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/04.jpg",
+    alt: "Photograph 4 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/05.jpg",
+    alt: "Photograph 5 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/06.jpg",
+    alt: "Photograph 6 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/07.jpg",
+    alt: "Photograph 7 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/08.jpg",
+    alt: "Photograph 8 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/09.jpg",
+    alt: "Photograph 9 from Not Quite Leaving",
+  },
+  {
+    src: "/images/not-quite-leaving/10.jpg",
+    alt: "Photograph 10 from Not Quite Leaving",
+  },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Not Quite Leaving — Zheng Zhu</title>
+    <meta
+      name="description"
+      content="Not Quite Leaving, a photography project by Zheng Zhu."
+    />
+  </head>
+
+  <body>
+    <main class="page">
+      <header class="site-header">
+        <a class="site-title" href="/">ZHENG ZHU</a>
+        <a class="back-link" href="/">Back</a>
+      </header>
+
+      <section class="viewer" aria-label="Photo viewer">
+        <button
+          class="photo-button"
+          type="button"
+          aria-label="View previous or next photograph"
+        >
+          <span class="click-zone click-zone-left" aria-hidden="true"></span>
+          <img id="project-photo" src={photos[0].src} alt={photos[0].alt} />
+          <span class="click-zone click-zone-right" aria-hidden="true"></span>
+        </button>
+      </section>
+
+      <footer class="project-info">
+        <div>
+          <p class="project-title">Not Quite Leaving</p>
+          <p class="project-meta">Istanbul, 2026</p>
+        </div>
+
+        <p class="counter">
+          <span id="current-photo">01</span> / {
+            String(photos.length).padStart(2, "0")
+          }
+        </p>
+      </footer>
+    </main>
+
+    <script define:vars={{ photos }}>
+      let currentIndex = 0;
+      let isChanging = false;
+
+      const photo = document.getElementById("project-photo");
+      const currentPhoto = document.getElementById("current-photo");
+      const photoButton = document.querySelector(".photo-button");
+
+      function updateCounter() {
+        currentPhoto.textContent = String(currentIndex + 1).padStart(2, "0");
+      }
+
+      function changePhoto(direction) {
+        if (isChanging) return;
+
+        isChanging = true;
+        photo.classList.add("is-fading");
+
+        window.setTimeout(() => {
+          if (direction === "next") {
+            currentIndex = (currentIndex + 1) % photos.length;
+          }
+
+          if (direction === "prev") {
+            currentIndex =
+              currentIndex === 0 ? photos.length - 1 : currentIndex - 1;
+          }
+
+          photo.src = photos[currentIndex].src;
+          photo.alt = photos[currentIndex].alt;
+          updateCounter();
+
+          photo.onload = () => {
+            photo.classList.remove("is-fading");
+            isChanging = false;
+          };
+        }, 120);
+      }
+
+      photoButton.addEventListener("click", (event) => {
+        const rect = photoButton.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const middle = rect.width / 2;
+
+        if (clickX < middle) {
+          changePhoto("prev");
+        } else {
+          changePhoto("next");
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight" || event.key === " ") {
+          event.preventDefault();
+          changePhoto("next");
+        }
+
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          changePhoto("prev");
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  :global(*) {
+    box-sizing: border-box;
+  }
+
+  :global(html) {
+    background: #fafafa;
+  }
+
+  :global(body) {
+    margin: 0;
+    min-height: 100vh;
+    background: #fafafa;
+    color: #222;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+
+  :global(a) {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :global(a:hover) {
+    opacity: 0.45;
+  }
+
+  .page {
+    min-height: 100vh;
+    padding: 34px 42px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .site-header {
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 48px;
+    align-items: start;
+    position: relative;
+    z-index: 2;
+  }
+
+  .site-title {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  .back-link {
+    justify-self: start;
+    color: #555;
+  }
+
+  .viewer {
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+  }
+
+  .photo-button {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .photo-button:focus {
+    outline: none;
+  }
+
+  .photo-button:focus-visible {
+    outline: none;
+  }
+
+  .photo-button img {
+    display: block;
+    width: auto;
+    height: auto;
+
+    max-width: min(72vw, 980px);
+    max-height: 72vh;
+
+    object-fit: contain;
+    opacity: 1;
+
+    transition: opacity 240ms ease;
+  }
+
+  .click-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    z-index: 2;
+  }
+
+  .click-zone-left {
+    left: 0;
+    cursor: w-resize;
+  }
+
+  .click-zone-right {
+    right: 0;
+    cursor: e-resize;
+  }
+
+  .project-info {
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 48px;
+    align-items: end;
+    color: #555;
+  }
+
+  .project-info p {
+    margin: 0;
+  }
+
+  .project-title {
+    color: #222;
+  }
+
+  .project-meta {
+    margin-top: 3px !important;
+    color: #777;
+  }
+
+  .counter {
+    justify-self: start;
+    color: #777;
+  }
+
+  @media (max-width: 860px) {
+    .page {
+      padding: 24px 22px;
+    }
+
+    .site-header,
+    .project-info {
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+    }
+
+    .viewer {
+      padding: 42px 0;
+    }
+
+    .photo-button img {
+      max-width: 92vw;
+      max-height: 68vh;
+    }
+  }
+</style>
